@@ -1,0 +1,15 @@
+.idea
+*.iml
+*.ipr
+*.iws
+classes
+gen-external-apklibs
+.DS_Store
+
+#gradle
+.gradle
+local.properties
+gradlew
+gradlew.bat
+gradle/
+build/
