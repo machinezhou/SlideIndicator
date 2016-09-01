@@ -1,13 +1,15 @@
 package com.zhou.lawson.slideindicator;
 
 import android.support.v4.view.ViewPager;
+import android.view.MotionEvent;
+import android.view.View;
 
 /**
  * Created by lawson on 16/8/29.
  *
  * from viewpagerindicator by jack wharton
  */
-public interface PageIndicator extends ViewPager.OnPageChangeListener {
+public interface PageIndicator extends ViewPager.OnPageChangeListener, View.OnTouchListener {
   /**
    * Bind the indicator to a ViewPager.
    */
@@ -30,4 +32,6 @@ public interface PageIndicator extends ViewPager.OnPageChangeListener {
    * Notify the indicator that the fragment list has changed.
    */
   void notifyDataSetChanged();
+
+  boolean onTouch(View var1, MotionEvent var2);
 }

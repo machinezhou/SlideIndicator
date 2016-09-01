@@ -27,8 +27,9 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
   private TextView indicatorTextView;
   private ViewDragHelper helper;
   private ViewPager viewPager;
+  private OnTouchListener pagerTouchListener;
 
-  private boolean isIndicatorClicked = false;
+  private boolean isIndicatorTouched = false;
 
   private int startPointX;
   private int endPointX;
@@ -67,12 +68,17 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     }
   }
 
+  public void setOnPageTouchListener(OnTouchListener l) {
+    pagerTouchListener = l;
+  }
+
   @Override public void setViewPager(ViewPager view) {
     if (viewPager == view) {
       return;
     }
     if (viewPager != null) {
       viewPager.removeOnPageChangeListener(this);
+      viewPager.setOnTouchListener(null);
     }
     final PagerAdapter adapter = view.getAdapter();
     if (adapter == null) {
@@ -80,6 +86,7 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     }
     viewPager = view;
     viewPager.addOnPageChangeListener(this);
+    viewPager.setOnTouchListener(this);
     notifyDataSetChanged();
   }
 
@@ -93,6 +100,14 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
       throw new IllegalStateException("ViewPager has not been bound.");
     }
     slideTo(index);
+  }
+
+  @Override public boolean onTouch(View var1, MotionEvent ev) {
+    isIndicatorTouched = false;
+    if (pagerTouchListener != null) {
+      pagerTouchListener.onTouch(var1, ev);
+    }
+    return false;
   }
 
   @Override public void notifyDataSetChanged() {
@@ -149,7 +164,10 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
   }
 
   @Override public boolean onInterceptTouchEvent(MotionEvent ev) {
-    isIndicatorClicked = helper.isViewUnder(indicator, (int) ev.getX(), (int) ev.getY());
+    switch (ev.getAction()) {
+      case MotionEvent.ACTION_DOWN:
+        isIndicatorTouched = helper.isViewUnder(indicator, (int) ev.getX(), (int) ev.getY());
+    }
     return helper.shouldInterceptTouchEvent(ev);
   }
 
@@ -165,7 +183,6 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
       final View child = getChildAt(i);
       if (child == indicator) {
         int childTop = getPaddingTop();
-
         final int childBottom = childTop + getMeasuredHeight();
         final int childLeft = indicatorLeft;
         final int childRight = childLeft + child.getMeasuredWidth();
@@ -191,16 +208,15 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     @Override
     public void onViewPositionChanged(View changedView, int left, int top, int dx, int dy) {
       super.onViewPositionChanged(changedView, left, top, dx, dy);
-      //Log.e("-->>", "-left " + left);
     }
 
     @Override public void onViewReleased(View releasedChild, float xvel, float yvel) {
-      if (indicator == releasedChild) { //todo fix bug position reset
+      if (indicator == releasedChild) {
         indicatorLeft = releasedChild.getLeft();
 
-        int index = indicatorLeft / (width / size);
+        int index = releasedChild.getLeft() / (width / size);
         resetPoints(index);
-        if (indicatorLeft > getCurrentTabCenterX()) {
+        if (releasedChild.getLeft() > getCurrentTabCenterX()) {
           helper.settleCapturedViewAt(endPointX, getPaddingTop());
           mSelectedTabIndex = index + 1;
         } else {
@@ -209,6 +225,7 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
         }
         setIndicatorText(mSelectedTabIndex);
         viewPager.setCurrentItem(mSelectedTabIndex);
+
         invalidate();
       }
     }
@@ -216,14 +233,13 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     @Override public int getViewHorizontalDragRange(View child) {
       return indicator == child ? child.getWidth() : 0;
     }
-
-    @Override public void onEdgeTouched(int edgeFlags, int pointerId) {
-      super.onEdgeTouched(edgeFlags, pointerId);
-    }
   };
 
   @Override
   public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    if (isIndicatorTouched) {
+      return;
+    }
     slideBy(position, positionOffset);
   }
 
@@ -248,7 +264,9 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
    */
   final OnClickListener listener = new OnClickListener() {
     @Override public void onClick(View v) {
-      if (isIndicatorClicked) return;
+      if (isIndicatorTouched) {
+        return;
+      }
       slideTo(((TabView) v).getIndex());
     }
   };
