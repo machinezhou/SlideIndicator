@@ -1,7 +1,6 @@
 package com.zhou.lawson.slideindicator;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -147,7 +146,7 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     tabView.setText(text);
     tabView.setTextSize(14);
     tabView.getPaint().setFakeBoldText(true);
-    tabView.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
+    tabView.setTextColor(ContextCompat.getColor(getContext(), R.color.tab_text_color));
     tabView.setGravity(Gravity.CENTER);
     tabView.setClickable(true);
     tabView.setOnClickListener(listener);
@@ -338,7 +337,7 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     textView.setText(text);
     textView.setTextSize(14);
     textView.getPaint().setFakeBoldText(true);
-    textView.setTextColor(Color.WHITE);
+    textView.setTextColor(ContextCompat.getColor(getContext(), R.color.indicator_text_color));
     textView.setGravity(Gravity.CENTER);
     FrameLayout.LayoutParams params = new LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
         FrameLayout.LayoutParams.MATCH_PARENT);

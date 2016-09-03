@@ -3,7 +3,7 @@
   <corners
       android:radius="20dp"
   />
-  <stroke android:color="@color/primary" android:width="1dp"/>
+  <stroke android:color="@color/tab_stroke_color" android:width="1dp"/>
 
-  <solid android:color="@android:color/white"/>
+  <solid android:color="@color/tab_bg"/>
 </shape>
