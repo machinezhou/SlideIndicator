@@ -21,7 +21,8 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
 
   private static final CharSequence EMPTY_TITLE = "";
 
-  private LinearLayout tabLayout;
+  //private LinearLayout tabLayout;
+  private TabLayout tabLayout;
   private FrameLayout indicator;
   private TextView indicatorTextView;
   private ViewDragHelper helper;
@@ -36,6 +37,8 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
   private int mSelectedTabIndex = 0;
   private int width;
   private int size;
+
+  private float pagerDownY;
 
   public SlideIndicator(Context context) {
     this(context, null);
@@ -55,7 +58,7 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
   }
 
   private void addTabLayout() {
-    tabLayout = new LinearLayout(getContext());
+    tabLayout = new TabLayout(getContext());
     tabLayout.setLayoutParams(
         new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     addView(tabLayout);
@@ -105,6 +108,18 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     isIndicatorTouched = false;
     if (pagerTouchListener != null) {
       pagerTouchListener.onTouch(var1, ev);
+    }
+    switch (ev.getAction()) {
+      case MotionEvent.ACTION_DOWN:
+        pagerDownY = ev.getY();
+        break;
+      case MotionEvent.ACTION_MOVE:
+        float distance = ev.getY() - pagerDownY;
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
+        params.height += distance;
+        setLayoutParams(params);
+        requestLayout();
+        break;
     }
     return false;
   }
