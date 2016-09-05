@@ -36,6 +36,7 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
   private int indicatorLeft = 0;
   private int mSelectedTabIndex = 0;
   private int width;
+  private int height;
   private int size;
 
   private float pagerDownY;
@@ -165,12 +166,14 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     tabView.setGravity(Gravity.CENTER);
     tabView.setClickable(true);
     tabView.setOnClickListener(listener);
-    tabLayout.addView(tabView, new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f));
+    tabLayout.addView(tabView,
+        new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
   }
 
   @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     super.onSizeChanged(w, h, oldw, oldh);
     width = w;
+    height = h;
 
     resetPoints(mSelectedTabIndex);
     indicator.setLayoutParams(new LayoutParams(width / size, ViewGroup.LayoutParams.MATCH_PARENT));
