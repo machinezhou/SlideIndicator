@@ -21,10 +21,8 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
 
   private static final CharSequence EMPTY_TITLE = "";
 
-  //private LinearLayout tabLayout;
   private TabLayout tabLayout;
-  private FrameLayout indicator;
-  private TextView indicatorTextView;
+  private Indicator indicator;
   private ViewDragHelper helper;
   private ViewPager viewPager;
   private OnTouchListener pagerTouchListener;
@@ -116,10 +114,12 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
         break;
       case MotionEvent.ACTION_MOVE:
         float distance = ev.getY() - pagerDownY;
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
-        params.height += distance;
-        setLayoutParams(params);
-        requestLayout();
+        //LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) getLayoutParams();
+        //params.height += distance;
+        //setLayoutParams(params);
+        //indicator.setDownY(distance);
+        //indicator.setBounds((int) distance, (int) distance);
+        //requestLayout();
         break;
     }
     return false;
@@ -147,12 +147,9 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
   }
 
   private void addIndicator() {
-    indicatorTextView = getDefaultIndicatorTextView(getIndicatorText(mSelectedTabIndex));
+    indicator = new Indicator(getContext());
+    indicator.setText(getIndicatorText(mSelectedTabIndex));
 
-    indicator = new FrameLayout(getContext());
-    indicator.setBackgroundResource(R.drawable.shape_indicator);
-    indicator.setClickable(false);
-    indicator.addView(indicatorTextView);
     addView(indicator);
   }
 
@@ -176,8 +173,7 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
     height = h;
 
     resetPoints(mSelectedTabIndex);
-    indicator.setLayoutParams(new LayoutParams(width / size, ViewGroup.LayoutParams.MATCH_PARENT));
-    indicator.invalidate();
+    indicator.setSize(width / size, h);
   }
 
   @Override public boolean onInterceptTouchEvent(MotionEvent ev) {
@@ -307,18 +303,14 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
    * set indicator text
    */
   private void setIndicatorText(String text) {
-    if (indicatorTextView != null) {
-      indicatorTextView.setText(text);
-    }
+    indicator.setText(text);
   }
 
   /**
    * set indicator text by index
    */
   private void setIndicatorText(int index) {
-    if (indicatorTextView != null) {
-      setIndicatorText(getIndicatorText(index));
-    }
+    indicator.setText(getIndicatorText(index));
   }
 
   /**
@@ -345,24 +337,6 @@ public class SlideIndicator extends FrameLayout implements PageIndicator {
   private void slideBy(int position, float positionOffset) {
     indicatorLeft = (int) (getPaddingLeft() + (width / size) * (position + positionOffset));
     requestLayout();
-  }
-
-  private TextView getDefaultIndicatorTextView(CharSequence text) {
-    if (indicatorTextView != null) {
-      return indicatorTextView;
-    }
-    TextView textView = new TextView(getContext());
-    textView.setText(text);
-    textView.setTextSize(14);
-    textView.getPaint().setFakeBoldText(true);
-    textView.setTextColor(ContextCompat.getColor(getContext(), R.color.indicator_text_color));
-    textView.setGravity(Gravity.CENTER);
-    FrameLayout.LayoutParams params = new LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-        FrameLayout.LayoutParams.MATCH_PARENT);
-    params.gravity = Gravity.CENTER;
-    textView.setLayoutParams(params);
-    textView.setClickable(false);
-    return textView;
   }
 
   private class TabView extends TextView {
